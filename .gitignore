@@ -1,0 +1,15 @@
+# Variables de entorno
+.env
+
+# Dataset y archivos CSV
+*.csv
+data/
+
+# Resultados generados
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/

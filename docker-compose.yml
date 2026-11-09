@@ -1,0 +1,49 @@
+services:
+  hadoop:
+    build:
+      context: ./hadoop
+    container_name: datamart-hadoop
+    volumes:
+      - ./data:/data/input:ro
+      - ./mapreduce:/app/mapreduce:ro
+      - ./output:/data/output
+      - ssh_keys:/shared-ssh
+    networks:
+      - datamart-network
+
+  db:
+    image: postgres:16
+    container_name: datamart-db
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - datamart-network
+
+  api:
+    build:
+      context: ./api
+    container_name: datamart-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    volumes:
+      - ssh_keys:/shared-ssh:ro
+      - ./output:/data/output:ro
+      - ./scripts:/scripts:ro
+    depends_on:
+      - db
+    networks:
+      - datamart-network
+
+volumes:
+  postgres_data:
+  ssh_keys:
+
+networks:
+  datamart-network:
+    driver: bridge
